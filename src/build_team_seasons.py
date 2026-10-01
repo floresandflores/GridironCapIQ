@@ -34,25 +34,34 @@ POSITION_GROUPS = {
 }
 
 
-def build_cap_by_position():
-    """Flatten each player's season-by-season cap history into one row per player-season."""
+def load_player_seasons():
+    """Flatten each player's season-by-season cap history into one row per player-season-team."""
     contracts = nfl.load_contracts().to_pandas()
     # season_history covers a player's whole career, so keep one row per player
     contracts = contracts.drop_duplicates("otc_id")
 
     rows = []
-    for position, history in zip(contracts["position"], contracts["season_history"]):
+    for otc_id, position, history in zip(
+        contracts["otc_id"], contracts["position"], contracts["season_history"]
+    ):
         if history is None:
             continue
         for year in history:
             if not str(year.get("year")).isdigit():  # skips the "Total" row
                 continue
-            rows.append((int(year["year"]), year["team"], position, year["cap_number"]))
-    cap = pd.DataFrame(rows, columns=["season", "team_name", "position", "cap_number"])
+            rows.append((otc_id, int(year["year"]), year["team"], position,
+                         year["cap_number"], year["cap_percent"], year["cash_paid"]))
+    seasons = pd.DataFrame(rows, columns=["otc_id", "season", "team_name", "position",
+                                          "cap_number", "cap_percent", "cash_paid"])
 
-    cap["team"] = cap["team_name"].map(NICKNAME_TO_ABBR)
-    cap["position_group"] = cap["position"].map(POSITION_GROUPS)
-    cap = cap.dropna(subset=["team", "position_group", "cap_number"])
+    seasons["team"] = seasons["team_name"].map(NICKNAME_TO_ABBR)
+    seasons["position_group"] = seasons["position"].map(POSITION_GROUPS)
+    return seasons.dropna(subset=["team", "position_group", "cap_number"])
+
+
+def build_cap_by_position():
+    """Total cap spending per team per season, split by position group."""
+    cap = load_player_seasons()
 
     by_position = cap.pivot_table(
         index=["season", "team"], columns="position_group",
