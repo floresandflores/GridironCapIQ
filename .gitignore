@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Data: raw and cleaned files are re-created by the scripts, so keep them out of Git
+data/raw/*
+!data/raw/.gitkeep
+data/clean/
+*.db
+*.sqlite
+
+# Editors / OS
+.DS_Store
+.vscode/
+.ipynb_checkpoints/
