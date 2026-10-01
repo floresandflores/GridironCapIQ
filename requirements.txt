@@ -1,3 +1,5 @@
 nflreadpy
 pandas
 pyarrow
+streamlit>=1.52
+altair
