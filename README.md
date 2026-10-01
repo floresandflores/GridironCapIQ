@@ -16,9 +16,9 @@ It mirrors a common business problem: dividing a fixed budget across departments
 | Phase | Status |
 |---|---|
 | 1. Explore the data in Excel | In progress |
-| 2. First Python: load, filter, clean | In progress (`src/build_team_seasons.py`) |
-| 3. SQLite database and ER diagram | Not started |
-| 4. SQL analysis | Not started |
+| 2. First Python: load, filter, clean | Done (`src/build_team_seasons.py`) |
+| 3. SQLite database and ER diagram | Done ([ER diagram](docs/er_diagram.md), `src/build_database.py`) |
+| 4. SQL analysis | In progress ([findings](docs/findings.md), `sql/analysis/`) |
 | 5. Streamlit dashboard | Not started |
 | 6. Business-case write-up | Not started |
 
@@ -39,4 +39,20 @@ Then build the team-by-season table:
 python src/build_team_seasons.py
 ```
 
-This writes `data/clean/team_seasons.csv`: one row per team per season (2013-2025) with wins, points, and cap spending by position group. Cap numbers come from each player's real season-by-season cap hit (`season_history` in the contracts data). They cover the contracts OverTheCap tracks, roughly 80% of the full cap, so compare teams by share of tracked cap (for example `qb_cap_pct`), not by raw dollars.
+Then build the database:
+
+```bash
+python src/build_database.py
+```
+
+This writes `data/gridironcapiq.db` (schema in `sql/schema.sql`, diagram in [docs/er_diagram.md](docs/er_diagram.md)).
+
+Run any analysis query:
+
+```bash
+python src/run_query.py sql/analysis/01_qb_cap_vs_wins.sql
+```
+
+Results so far are in [docs/findings.md](docs/findings.md).
+
+The team-season step writes `data/clean/team_seasons.csv`: one row per team per season (2013-2025) with wins, points, and cap spending by position group. Cap numbers come from each player's real season-by-season cap hit (`season_history` in the contracts data). They cover the contracts OverTheCap tracks, roughly 80% of the full cap, so compare teams by share of tracked cap (for example `qb_cap_pct`), not by raw dollars.
