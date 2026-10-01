@@ -3,7 +3,7 @@
 -- 3 seasons of his draft year (the first 4 seasons). Cap hits jump after year 3 in the data.
 -- Two measures per team-season:
 --   rookie_pct  = share of the team's tracked cap going to rookie-deal players
---   rookie_core = how many drafted players on rookie deals the team carries
+--   rookie_count = how many drafted players on rookie deals the team carries
 -- Bands are set around the typical team (median 26%), since every roster carries many cheap rookies.
 -- Seasons 2013-2025.
 
