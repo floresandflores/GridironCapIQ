@@ -25,7 +25,33 @@ The best seasons from teams spending under 5% on QBs are mostly QBs on rookie co
 
 This points at the brief's rookie-contract question: a good QB on a rookie deal frees cap for the rest of the roster. That's the next query.
 
+## Q2: Do teams that lean on cheap rookie contracts win more?
+
+Queries: [`03_rookie_deals_vs_wins.sql`](../sql/analysis/03_rookie_deals_vs_wins.sql), [`04_early_picks_vs_wins.sql`](../sql/analysis/04_early_picks_vs_wins.sql)
+
+A player counts as "on a rookie deal" when he was drafted and the season is within 3 years of his draft year (cap hits jump after year 3 in the data).
+
+| Share of cap on rookie-deal players | Team-seasons | Avg wins (per 17) |
+|---|---|---|
+| under 22% | 68 | 9.1 |
+| 22-27% | 161 | 8.7 |
+| 27-32% | 104 | 8.7 |
+| 32% or more | 83 | 7.3 |
+
+| Premium picks (rounds 1-2) on rookie deals | Team-seasons | Avg wins (per 17) |
+|---|---|---|
+| 0-4 | 14 | 7.0 |
+| 5-7 | 172 | 8.6 |
+| 8-10 | 202 | 8.3 |
+| 11 or more | 28 | 9.9 |
+
+- Teams with a very high rookie share (32%+) win about 2 fewer games than teams under 22%. The overall correlation is -0.20.
+- This probably does **not** mean rookies hurt. When a team has few expensive veterans, rookies take a bigger share of the cap by default, and teams without good veterans lose more. The share is partly a symptom.
+- Premium picks tell a milder story: teams with 11 or more rounds 1-2 picks on rookie deals average 9.9 wins, but the correlation is only 0.05 and those groups are small.
+- A fairer test (for Phase 4 later): compare rookie-deal players to veterans at the same position, and ask which group gives more wins per dollar.
+
 ## Caveats
 
 - Correlation, not cause: good QBs get paid *because* they win.
+- "Rookie deal" is inferred from draft year (first 4 seasons), not read from contract type.
 - Cap hits cover about 79-89% of each team's cap (no dead money).
