@@ -47,6 +47,8 @@ python src/build_database.py
 
 This writes `data/gridironcapiq.db` (schema in `sql/schema.sql`, diagram in [docs/er_diagram.md](docs/er_diagram.md)).
 
+Keep the data fresh: `.github/workflows/refresh-data.yml` rebuilds the database from the latest nflverse data every Tuesday, runs `python src/check_database.py`, and commits only if the data changed. It can also be started by hand from the repository's Actions tab. If the build or the check fails, nothing is committed.
+
 Run the dashboard:
 
 ```bash
