@@ -18,8 +18,8 @@ It mirrors a common business problem: dividing a fixed budget across departments
 | 1. Explore the data in Excel | In progress |
 | 2. First Python: load, filter, clean | Done (`src/build_team_seasons.py`) |
 | 3. SQLite database and ER diagram | Done ([ER diagram](docs/er_diagram.md), `src/build_database.py`) |
-| 4. SQL analysis | In progress ([findings](docs/findings.md), `sql/analysis/`) |
-| 5. Streamlit dashboard | Not started |
+| 4. SQL analysis | Done ([findings](docs/findings.md), `sql/analysis/`) |
+| 5. Streamlit dashboard | In progress (`streamlit_app.py`) |
 | 6. Business-case write-up | Not started |
 
 ## Run it
@@ -46,6 +46,12 @@ python src/build_database.py
 ```
 
 This writes `data/gridironcapiq.db` (schema in `sql/schema.sql`, diagram in [docs/er_diagram.md](docs/er_diagram.md)).
+
+Run the dashboard:
+
+```bash
+streamlit run streamlit_app.py
+```
 
 Run any analysis query:
 
