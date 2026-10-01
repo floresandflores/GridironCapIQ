@@ -50,6 +50,51 @@ A player counts as "on a rookie deal" when he was drafted and the season is with
 - Premium picks tell a milder story: teams with 11 or more rounds 1-2 picks on rookie deals average 9.9 wins, but the correlation is only 0.05 and those groups are small.
 - A fairer test (for Phase 4 later): compare rookie-deal players to veterans at the same position, and ask which group gives more wins per dollar.
 
+## Q3: Which teams got the most wins out of their cap?
+
+Query: [`05_team_cap_efficiency.sql`](../sql/analysis/05_team_cap_efficiency.sql)
+
+Efficiency here is average wins (per 17 games) per 10 points of cap share spent, 2013-2025.
+
+| Rank | Team | Avg wins | Avg cap share |
+|---|---|---|---|
+| 1 | Kansas City Chiefs | 11.9 | 90.6% |
+| 2 | Seattle Seahawks | 10.9 | 85.5% |
+| 3 | New England Patriots | 10.7 | 85.9% |
+| 4 | Philadelphia Eagles | 10.2 | 82.8% |
+| 5 | Buffalo Bills | 10.2 | 85.1% |
+| ... | | | |
+| 28 | Washington Commanders | 6.7 | 86.7% |
+| 30 | Cleveland Browns | 5.8 | 82.9% |
+| 31 | Jacksonville Jaguars | 5.9 | 85.0% |
+| 32 | New York Jets | 5.7 | 82.2% |
+
+- The top and bottom of the table are the same teams that win and lose the most, because cap share varies only from about 80% to 95% across teams. Almost all of the ranking comes from wins.
+- Cap share differences are partly a data artifact (how many contracts are tracked per team), so this ranking says less about "who spends smartly" than a true cap-efficiency measure would. A better version needs dead money and full-roster cap totals.
+
+## Q4: Which positions show the biggest gap between big spenders and low spenders?
+
+Query: [`06_position_spend_vs_wins.sql`](../sql/analysis/06_position_spend_vs_wins.sql)
+
+Each team-season is placed in the top, middle or bottom third of spending on a position group (as a share of the league cap). Gap = average wins of the top third minus the bottom third.
+
+| Position group | Top-third wins | Bottom-third wins | Gap |
+|---|---|---|---|
+| Safety | 9.0 | 8.1 | +0.86 |
+| Edge rusher | 8.9 | 8.2 | +0.73 |
+| Tight end | 8.8 | 8.1 | +0.72 |
+| Quarterback | 8.9 | 8.2 | +0.67 |
+| Offensive line | 8.8 | 8.3 | +0.46 |
+| Wide receiver | 8.5 | 8.2 | +0.30 |
+| Linebacker | 8.8 | 8.6 | +0.26 |
+| Cornerback | 8.5 | 8.4 | +0.13 |
+| Interior D-line | 8.4 | 8.3 | +0.10 |
+| Running back | 8.5 | 8.5 | -0.01 |
+
+- Running back is the clearest case of spending that doesn't show up in wins: teams paying RBs a lot win no more than teams paying them little.
+- Gaps are small (under one win), so treat the ordering as a hint. Safety, edge and tight end lead, but these gaps could partly be noise.
+- Same caveat as before: correlation, not cause.
+
 ## Caveats
 
 - Correlation, not cause: good QBs get paid *because* they win.
