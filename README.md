@@ -16,7 +16,7 @@ It mirrors a common business problem: dividing a fixed budget across departments
 | Phase | Status |
 |---|---|
 | 1. Explore the data in Excel | In progress |
-| 2. First Python: load, filter, clean | Started (`src/load_data.py`) |
+| 2. First Python: load, filter, clean | In progress (`src/build_team_seasons.py`) |
 | 3. SQLite database and ER diagram | Not started |
 | 4. SQL analysis | Not started |
 | 5. Streamlit dashboard | Not started |
@@ -32,3 +32,11 @@ python src/load_data.py
 ```
 
 This downloads the current contracts and schedules data and saves copies to `data/raw/` as CSV files (ignored by Git).
+
+Then build the team-by-season table:
+
+```bash
+python src/build_team_seasons.py
+```
+
+This writes `data/clean/team_seasons.csv`: one row per team per season (2013-2025) with wins, points, and cap spending by position group. Cap numbers come from each player's real season-by-season cap hit (`season_history` in the contracts data). They cover the contracts OverTheCap tracks, roughly 80% of the full cap, so compare teams by share of tracked cap (for example `qb_cap_pct`), not by raw dollars.
