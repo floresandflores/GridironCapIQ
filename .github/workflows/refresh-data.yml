@@ -1,0 +1,45 @@
+name: Refresh data
+
+# Rebuilds the database from the latest nflverse data every Tuesday (after Monday night
+# games) and commits it only if it changed. Streamlit Community Cloud redeploys on each push.
+# A failed build or failed check stops the job before anything is committed.
+on:
+  schedule:
+    - cron: "0 12 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Rebuild team-season table and database
+        run: |
+          python src/build_team_seasons.py
+          python src/build_database.py
+
+      - name: Check the new database
+        run: python src/check_database.py
+
+      - name: Commit if the database changed
+        run: |
+          if git diff --quiet -- data/gridironcapiq.db; then
+            echo "No data changes."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/gridironcapiq.db
+            git commit -m "Refresh data from nflverse"
+            git push
+          fi
