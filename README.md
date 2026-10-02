@@ -2,6 +2,8 @@
 
 **How do winning NFL teams divide a fixed salary cap differently from losing ones?**
 
+**Live dashboard: https://gridironcapiq.streamlit.app/**
+
 An analysis of 13 seasons of NFL contract and game data (2013-2025): a Python data pipeline, a SQLite database, SQL analysis, and an interactive Streamlit dashboard.
 
 ## The business problem
