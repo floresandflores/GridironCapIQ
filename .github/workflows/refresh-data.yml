@@ -28,18 +28,19 @@ jobs:
         run: |
           python src/build_team_seasons.py
           python src/build_database.py
+          python src/export_powerbi.py
 
       - name: Check the new database
         run: python src/check_database.py
 
       - name: Commit if the database changed
         run: |
-          if git diff --quiet -- data/gridironcapiq.db; then
+          if git diff --quiet -- data/gridironcapiq.db data/powerbi; then
             echo "No data changes."
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/gridironcapiq.db
+            git add data/gridironcapiq.db data/powerbi
             git commit -m "Refresh data from nflverse"
             git push
           fi
