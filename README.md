@@ -1,99 +1,49 @@
 # GridironCapIQ
 
-**How do winning NFL teams divide a fixed salary cap differently from losing ones?**
-
-**Live dashboard: https://gridironcapiq.streamlit.app/**
-
-An analysis of 13 seasons of NFL contract and game data (2013-2025): a Python data pipeline, a SQLite database, SQL analysis, and an interactive Streamlit dashboard.
-
-## The business problem
-
-Every NFL team plays under roughly the same salary cap, yet results vary widely: some teams win 13 games a year and others win 4. Dividing a fixed budget across competing priorities is a problem every organization has, whether it is a department budget or a hiring plan. The cap makes it unusually measurable, because every dollar is public and every outcome is a win or a loss.
-
-This project asks which allocation choices go with winning, and which spending shows no return.
-
-## Key findings
-
-All results are regular seasons from 2013 to 2025 (416 team-seasons), with wins scaled to a 17-game season. Full tables and the SQL behind them are in [docs/findings.md](docs/findings.md).
-
-**1. A mid-sized quarterback investment goes with winning. Going bigger does not help.**
-Teams that put 10-15% of the cap on quarterbacks averaged 9.1 wins and made the playoffs 46% of the time, against 8.1 wins and 37% for teams under 10%. Teams past 15% did slightly worse than the 10-15% group (8.8 wins). Across all teams the link is weak (correlation 0.11), so QB spending explains very little on its own.
-
-**2. Running back spending shows no link to wins.**
-Comparing the top and bottom third of spenders at each position, teams that spend a lot on running backs win no more than teams that spend little (gap of -0.01 wins). Safety (+0.86), edge rusher (+0.73), tight end (+0.72) and quarterback (+0.67) show the largest gaps, though every gap is under one win.
-
-**3. Rookie-heavy rosters win less, probably as a symptom and not a cause.**
-Teams that put 32% or more of their tracked cap on players in their first four seasons averaged 7.3 wins, against 9.1 for teams under 22%. That share is partly mechanical: a team with few expensive veterans has a larger rookie share by default, and those teams tend to be weaker. Counting only round 1-2 picks, the link nearly disappears (correlation 0.05).
-
-**4. Some of the best low-QB-cost seasons came from young quarterbacks.**
-2019 Baltimore, 2022 Philadelphia and 2025 Denver each won 14 games while spending under 4% of the cap at quarterback.
-
-## What I would do with this
-
-If this were a real front-office question, I would treat these as places to look, not conclusions:
-
-- **Do not pay quarterbacks past about 15% of the cap on the strength of wins alone.** The data shows no extra return beyond that point.
-- **Question large running back contracts.** This is the clearest case of spending that does not show up in wins.
-- **Test safety, edge rusher and tight end more closely.** They show the largest gaps, but the gaps are small. The next step is to compare players at the same position, not whole rosters.
-- **Compare rookie-deal players with veterans at the same position,** in wins per dollar, before drawing any conclusion about building through the draft.
-
-## Limits of the analysis
-
-Being clear about these is part of the work:
-
-- **Correlation, not cause.** Good players get paid because they win, so spending and winning are tangled together.
-- **The data covers about 79-89% of each team's cap.** It is built from each player's real season-by-season cap hit, but it misses some contracts and all dead money (charges for players a team already cut). Teams are compared by share of cap, not raw dollars.
-- **The team efficiency ranking is mostly a ranking by wins,** because the tracked share of cap varies little between teams.
-- **"Rookie deal" is inferred** from draft year (first four seasons), not read from the contract type.
-- Differences between groups are often under one win per season, so many are within normal year-to-year noise.
-
-## How it works
-
-```
-nflverse data  ->  Python (pandas)  ->  SQLite  ->  SQL analysis  ->  Streamlit dashboard
- (via nflreadpy)    clean + reshape      7 linked       6 queries       key findings, team
- contracts, games                         tables                         explorer, rankings
-```
-
-1. **Load and reshape (Python).** `src/build_team_seasons.py` pulls contract and schedule data with `nflreadpy`, flattens each player's career cap history into one row per player-season, maps contract team nicknames to game abbreviations (handling relocated franchises), and builds one row per team per season with wins and cap spending by position group.
-2. **Store (SQLite).** `src/build_database.py` loads seven tables with primary and foreign keys: teams, seasons, games, players, contracts, player_seasons and team_seasons. See the [ER diagram](docs/er_diagram.md) and [`sql/schema.sql`](sql/schema.sql).
-3. **Analyze (SQL).** Six queries in [`sql/analysis/`](sql/analysis/) use CTEs, joins, conditional aggregation and window functions (`RANK`, `NTILE`).
-4. **Present (Streamlit).** `streamlit_app.py` opens with the key findings, then lets you pick a season and team to see cap by position against the league average, a QB spending vs wins scatter plot, and team rankings. The headline numbers come from the same SQL files as the analysis.
-5. **Stay current.** A scheduled GitHub Action ([`refresh-data.yml`](.github/workflows/refresh-data.yml)) rebuilds the database from the latest nflverse data every Tuesday, runs sanity checks ([`src/check_database.py`](src/check_database.py)), and commits only if the data changed. If anything looks wrong, it stops before committing.
-
-## Run it yourself
-
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-python src/build_team_seasons.py   # builds data/clean/team_seasons.csv
-python src/build_database.py       # builds data/gridironcapiq.db
-streamlit run streamlit_app.py     # opens the dashboard
-```
-
-Run any analysis query on its own:
-
-```bash
-python src/run_query.py sql/analysis/01_qb_cap_vs_wins.sql
-```
-
-## Project layout
-
-```
-streamlit_app.py            the dashboard
-src/                        data pipeline (build_team_seasons, build_database, check_database, run_query, load_data)
-sql/schema.sql              database schema
-sql/analysis/               the six analysis queries
-docs/findings.md            full results tables and caveats
-docs/er_diagram.md          database design and ER diagram
-data/gridironcapiq.db       the built database (kept in the repo so the hosted app can read it)
-.github/workflows/          scheduled data refresh
-```
+Every NFL team works with roughly the same salary cap, yet results vary widely. This repo holds the raw data for exploring how winning teams spend that fixed budget differently from losing ones. What to build on it is still being decided.
 
 ## Data
 
-[nflverse](https://github.com/nflverse) (free, open-source NFL data). Contract data is sourced from OverTheCap.com, which I used to sanity-check numbers.
+Both files come from [nflverse](https://github.com/nflverse/nflverse-data) and were pulled on 2026-10-01.
 
-Built with Python, pandas, SQLite, SQL and Streamlit.
+| File | Rows | What it is |
+|---|---|---|
+| `data/raw/contracts.csv` | 53,041 | One row per player contract (OverTheCap data via nflverse) |
+| `data/raw/games.csv` | 7,548 | One row per game, seasons 1999-2026 |
+
+### contracts.csv
+
+Converted from nflverse `historical_contracts.parquet` (release tag `contracts`). The older `historical_contracts.csv.gz` stopped updating in 2022, so use the parquet for fresh pulls. The nested `season_history` and `contract_history` columns were dropped in the conversion.
+
+| Column | Meaning |
+|---|---|
+| `player`, `position` | Player name and position |
+| `team` | Team nickname (e.g. "Chiefs"); players with several teams look like "NYJ/GB" |
+| `is_active` | TRUE for current contracts |
+| `year_signed`, `years` | Signing year and length. 1,106 rows have `year_signed` = 0 (missing) |
+| `value`, `apy`, `guaranteed` | Total value, average per year, guaranteed money, in **$ millions** |
+| `apy_cap_pct` | APY as a fraction of that year's cap (0.245 = 24.5%) |
+| `inflated_*` | The money columns adjusted for cap growth |
+| `otc_id`, `gsis_id`, `player_page` | OverTheCap id, nflverse player id, OverTheCap link |
+| `height`, `weight`, `college`, `date_of_birth` | Player details |
+| `draft_year`, `draft_round`, `draft_overall`, `draft_team` | Draft details |
+
+### games.csv
+
+From `https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv`.
+
+| Column | Meaning |
+|---|---|
+| `game_id`, `season`, `week` | Game key, season, week |
+| `game_type` | REG, WC, DIV, CON or SB |
+| `home_team`, `away_team` | Team abbreviations (e.g. "KC"), including old codes OAK, SD, STL |
+| `home_score`, `away_score` | Final scores (blank for games not played yet) |
+| `result` | `home_score - away_score` |
+| `spread_line`, `total_line`, moneylines | Betting lines |
+| other columns | Rest days, roof, surface, weather, starting QBs, coaches, stadium |
+
+Note that contracts use team nicknames while games use abbreviations, so joining them needs a mapping.
+
+## Earlier version
+
+The first version of this project (cleaning scripts, SQLite database, SQL analysis, Streamlit dashboard and write-up) is saved on the [`archive/pre-reset-2026-10-06`](https://github.com/floresandflores/GridironCapIQ/tree/archive/pre-reset-2026-10-06) branch.
