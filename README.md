@@ -88,7 +88,9 @@ sql/schema.sql              database schema
 sql/analysis/               the six analysis queries
 docs/findings.md            full results tables and caveats
 docs/er_diagram.md          database design and ER diagram
+docs/powerbi_guide.md       step-by-step guide to the Power BI version
 data/gridironcapiq.db       the built database (kept in the repo so the hosted app can read it)
+data/powerbi/               CSV exports for Power BI (src/export_powerbi.py)
 .github/workflows/          scheduled data refresh
 ```
 
